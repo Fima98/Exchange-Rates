@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <form id="conversion-form">
+        <input type="number" id="amount" name="amount" required>
+        <input type="text" id="from_currency" name="from_currency" required>
+        <input type="text" id="to_currency" name="to_currency" required>
+        <button type="submit">Convert</button>
+    </form>
+    <div id="result"></div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
