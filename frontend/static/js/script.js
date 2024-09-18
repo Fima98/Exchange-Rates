@@ -17,22 +17,67 @@ document.getElementById('conversion-form').addEventListener('submit', async func
                 to_currency: toCurrency
             })
         });
-        const result = await response.json()
+
+        const result = await response.json();
 
         if (response.ok) {
             document.getElementById('result').innerHTML = `
                 <p>${amount} ${fromCurrency} is equivalent to ${result.converted_amount.toFixed(2)} ${toCurrency}</p>
             `;
+            
+            const conversionData = {
+                amount: amount,
+                fromCurrency: fromCurrency,
+                toCurrency: toCurrency,
+                convertedAmount: result.converted_amount.toFixed(2),
+                timestamp: Date.now() 
+            };
+
+            localStorage.setItem(`conversion_${conversionData.timestamp}`, JSON.stringify(conversionData));
+            updateHistory();
         } else {
-            document.getElementById('result').innerHTML = `
-                <p>Error: ${result.ERROR || result.error}</p>
-            `;
+            console.log('Error:', result.message || 'Unknown error');
         }
-        
 
     } catch (error) {
-        document.getElementById('result').innerHTML = `
-        <p>Error: ${error.message}</p>
-        `;
+        console.log('Fetch error:', error);
     }
-})
+});
+
+document.getElementById('delete-button').addEventListener('click', function (event) {
+    event.preventDefault();
+    clearHistory();
+});
+
+function updateHistory() {
+    const historyList = document.getElementById('history-list');
+    historyList.innerHTML = '';
+
+    const conversions = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('conversion_')) {
+            const conversion = JSON.parse(localStorage.getItem(key));
+            conversions.push(conversion);
+        }
+    }
+
+    conversions.sort((a, b) => b.timestamp - a.timestamp);
+
+    conversions.forEach(conversion => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+            <strong>${conversion.amount} ${conversion.fromCurrency}</strong> 
+            to <strong>${conversion.convertedAmount} ${conversion.toCurrency}</strong>
+        `;
+        historyList.appendChild(listItem);
+    });
+}
+
+function clearHistory() {
+    localStorage.clear(); 
+    updateHistory(); 
+}
+
+window.onload = updateHistory;
